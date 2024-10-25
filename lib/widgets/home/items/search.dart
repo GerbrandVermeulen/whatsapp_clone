@@ -6,9 +6,10 @@ class Search extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      visualDensity: const VisualDensity(vertical: -4),
       contentPadding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 4,
+        horizontal: 12,
+        vertical: 0,
       ),
       title: Container(
         width: double.infinity,

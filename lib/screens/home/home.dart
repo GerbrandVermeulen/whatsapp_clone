@@ -107,7 +107,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         type: BottomNavigationBarType.fixed,
         onTap: (value) {
           setState(() {
-            _selectedPageIndex = 0 /* value */;
+            _selectedPageIndex = value /* value */;
           });
         },
         currentIndex: _selectedPageIndex,

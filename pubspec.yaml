@@ -1,5 +1,5 @@
 name: whatsapp_clone
-description: "A new Flutter project."
+description: "A WhatsApp Clone built using Flutter and Firebase."
 publish_to: 'none'
 version: 0.1.0
 
@@ -31,3 +31,17 @@ flutter:
   assets:
     - assets/images/user-icon.jpg
     - assets/images/meta-ai.png
+    - assets/images/splash.png
+
+  fonts:
+    - family: Helvatica
+      fonts:
+        - asset: fonts/Helvetica.ttf
+        - asset: fonts/Helvetica-Bold.ttf
+          weight: 700
+        - asset: fonts/Helvetica-BoldOblique.ttf
+          weight: 700
+        - asset: fonts/helvetica-light-587ebe5a59211.ttf
+        - asset: fonts/Helvetica-Oblique.ttf
+        - asset: fonts/helvetica-rounded-bold-5871d05ead8de.otf
+          weight: 700

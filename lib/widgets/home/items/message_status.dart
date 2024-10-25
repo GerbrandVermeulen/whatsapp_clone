@@ -18,46 +18,20 @@ class MessageStatus extends StatelessWidget {
         );
 
       case Status.sent:
-        indicator = const Icon(Icons.check);
+        indicator = const Icon(Icons.done_rounded);
 
       case Status.delivered:
-        indicator = const Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Icon(
-              Icons.check,
-              color: Colors.grey,
-              size: 18,
-            ),
-            Positioned(
-              left: 5.8,
-              child: Icon(
-                Icons.check,
-                color: Colors.grey,
-                size: 18,
-              ),
-            )
-          ],
+        indicator = const Icon(
+          Icons.done_all_rounded,
+          color: Colors.grey,
+          size: 18,
         );
 
       case Status.read:
-        indicator = const Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Icon(
-              Icons.check,
-              color: Colors.lightBlue,
-              size: 18,
-            ),
-            Positioned(
-              left: 5.8,
-              child: Icon(
-                Icons.check,
-                color: Colors.lightBlue,
-                size: 18,
-              ),
-            )
-          ],
+        indicator = const Icon(
+          Icons.done_all_rounded,
+          color: Colors.lightBlue,
+          size: 18,
         );
 
       case Status.failed:

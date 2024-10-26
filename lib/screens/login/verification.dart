@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:whatsapp_clone/widgets/login/verification_form.dart';
 
+import '../home/home.dart';
+
 class VerificationScreen extends StatefulWidget {
   const VerificationScreen({super.key});
 
@@ -114,7 +116,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                   onPressed: () {
                     // TODO Push screen to enter code
                     Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const VerificationScreen(),
+                      builder: (context) => const HomeScreen(),
                     ));
                   },
                   child: Row(

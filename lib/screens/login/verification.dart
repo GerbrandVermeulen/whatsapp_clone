@@ -4,8 +4,6 @@ import 'package:whatsapp_clone/util/alert.dart';
 
 FirebaseAuth auth = FirebaseAuth.instance;
 
-import '../home/home.dart';
-
 class VerificationScreen extends StatefulWidget {
   const VerificationScreen({super.key, required this.phoneNumber});
 
@@ -51,9 +49,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
   }
 
   void _signInWithOTP(String otp) async {
-    if (_verificationId == null) {
-      return;
-    }
+    print('Signing in with OTP: $otp');
     try {
       PhoneAuthCredential credential = PhoneAuthProvider.credential(
           verificationId: _verificationId!, smsCode: otp);

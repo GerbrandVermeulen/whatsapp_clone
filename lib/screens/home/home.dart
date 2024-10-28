@@ -69,7 +69,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           FloatingActionButton(
             elevation: 3,
             backgroundColor: Theme.of(context).colorScheme.primary,
-            onPressed: () {},
+            onPressed: () {
+              // TODO
+            },
             child: Stack(
               alignment: Alignment.center,
               children: [

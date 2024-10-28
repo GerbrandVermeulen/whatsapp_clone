@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:whatsapp_clone/model/language.dart';
-import 'package:whatsapp_clone/screens/login/verification.dart';
+import 'package:whatsapp_clone/screens/login/phone_login.dart';
 import 'package:whatsapp_clone/widgets/login/language_selector.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -152,7 +152,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   ),
                   onPressed: () {
                     Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const VerificationScreen(),
+                      builder: (context) => const PhoneLoginScreen(),
                     ));
                   },
                   child: Row(

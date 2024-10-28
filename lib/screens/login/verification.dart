@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:whatsapp_clone/screens/home/home.dart';
 import 'package:whatsapp_clone/util/alert.dart';
 
 FirebaseAuth auth = FirebaseAuth.instance;
@@ -16,17 +17,24 @@ class VerificationScreen extends StatefulWidget {
 class _VerificationScreenState extends State<VerificationScreen> {
   final TextEditingController _codeController = TextEditingController();
   String? _verificationId;
+  bool _isSending = true;
 
-  void _verifyPhoneNumber() async {
+  Future<void> _verifyPhoneNumber() async {
     print('Verifying phone number ${widget.phoneNumber}');
 
     await auth.verifyPhoneNumber(
       phoneNumber: widget.phoneNumber,
       verificationCompleted: (PhoneAuthCredential credential) async {
         await auth.signInWithCredential(credential);
+        Navigator.of(context).popUntil(
+          (route) => route.isFirst,
+        );
       },
       codeSent: (String verificationId, int? resendToken) async {
         _verificationId = verificationId;
+        setState(() {
+          _isSending = false;
+        });
         print('Received verification id: $verificationId');
       },
       verificationFailed: (FirebaseAuthException e) {
@@ -40,12 +48,14 @@ class _VerificationScreenState extends State<VerificationScreen> {
         print('Phone verification timed out! $verificationId');
       },
     );
+
+    print('Verified phone number ${widget.phoneNumber}');
   }
 
   @override
   void initState() {
     super.initState();
-    // _verifyPhoneNumber();
+    _verifyPhoneNumber();
   }
 
   void _signInWithOTP(String otp) async {
@@ -54,7 +64,10 @@ class _VerificationScreenState extends State<VerificationScreen> {
       PhoneAuthCredential credential = PhoneAuthProvider.credential(
           verificationId: _verificationId!, smsCode: otp);
 
-      await auth.signInWithCredential(credential);
+      auth.signInWithCredential(credential);
+      Navigator.of(context).popUntil(
+        (route) => route.isFirst,
+      );
     } on FirebaseAuthException catch (e) {
       _showFailedSigninDialog(
           e.message ?? 'Failed to authenticate phone number');
@@ -166,22 +179,25 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     ),
                     SizedBox(
                       width: 120,
-                      child: TextField(
-                        controller: _codeController,
-                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                            color: Theme.of(context).colorScheme.surface),
-                        onChanged: (value) {
-                          if (value.length == 6) {
-                            _signInWithOTP(value);
-                          }
-                        },
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        _verifyPhoneNumber();
-                      },
-                      child: const Text('Send OTP'),
+                      child: _isSending
+                          ? const LinearProgressIndicator(
+                              backgroundColor: Colors.transparent,
+                            )
+                          : TextField(
+                              controller: _codeController,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .surface),
+                              onChanged: (value) {
+                                if (value.length == 6) {
+                                  _signInWithOTP(value);
+                                }
+                              },
+                            ),
                     ),
                   ],
                 ),

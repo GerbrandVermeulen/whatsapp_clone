@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:whatsapp_clone/model/dummy_data.dart';
@@ -32,7 +33,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           PopupMenuButton(
             offset: const Offset(0, 54),
             color: Colors.white,
-            onSelected: (value) {},
+            onSelected: (value) {
+              if (value == 5) {
+                FirebaseAuth.instance.signOut();
+              }
+            },
             itemBuilder: (context) => [
               const PopupMenuItem(
                 value: 0,
@@ -53,6 +58,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               const PopupMenuItem(
                 value: 4,
                 child: Text('Settings'),
+              ),
+              const PopupMenuItem(
+                value: 5,
+                child: Text('*Sign out (temporary)'),
               ),
             ],
             icon: const Icon(Icons.more_vert),

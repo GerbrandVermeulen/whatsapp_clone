@@ -4,6 +4,8 @@ import 'package:whatsapp_clone/util/alert.dart';
 
 FirebaseAuth auth = FirebaseAuth.instance;
 
+import '../home/home.dart';
+
 class VerificationScreen extends StatefulWidget {
   const VerificationScreen({super.key, required this.phoneNumber});
 

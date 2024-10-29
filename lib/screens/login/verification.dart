@@ -1,6 +1,8 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:whatsapp_clone/screens/home/home.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:whatsapp_clone/util/alert.dart';
 
 FirebaseAuth auth = FirebaseAuth.instance;
@@ -15,33 +17,35 @@ class VerificationScreen extends StatefulWidget {
 }
 
 class _VerificationScreenState extends State<VerificationScreen> {
-  final TextEditingController _codeController = TextEditingController();
   String? _verificationId;
   bool _isSending = true;
 
+  final _cooldownSeconds = 10;
+  Timer? _timer;
+  int _seconds = 0;
+  bool _isCountingDown = true;
+
   Future<void> _verifyPhoneNumber() async {
     print('Verifying phone number ${widget.phoneNumber}');
+    setState(() {
+      _isSending = true;
+    });
+    _startTimer(_cooldownSeconds);
 
     await auth.verifyPhoneNumber(
       phoneNumber: widget.phoneNumber,
       verificationCompleted: (PhoneAuthCredential credential) async {
-        await auth.signInWithCredential(credential);
-        Navigator.of(context).popUntil(
-          (route) => route.isFirst,
-        );
+        await _signInWithCredential(credential);
       },
       codeSent: (String verificationId, int? resendToken) async {
-        _verificationId = verificationId;
         setState(() {
+          _verificationId = verificationId;
           _isSending = false;
         });
         print('Received verification id: $verificationId');
       },
       verificationFailed: (FirebaseAuthException e) {
-        if (e.code == 'invalid-phone-number') {
-          print('The provided phone number is not valid.');
-        }
-        print('Error verifying phone number: $e');
+        _showFailedSigninDialog('Error verifying phone number: ${e.message}');
       },
       timeout: const Duration(seconds: 60),
       codeAutoRetrievalTimeout: (String verificationId) {
@@ -52,19 +56,9 @@ class _VerificationScreenState extends State<VerificationScreen> {
     print('Verified phone number ${widget.phoneNumber}');
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _verifyPhoneNumber();
-  }
-
-  void _signInWithOTP(String otp) async {
-    print('Signing in with OTP: $otp');
+  Future<void> _signInWithCredential(PhoneAuthCredential credential) async {
     try {
-      PhoneAuthCredential credential = PhoneAuthProvider.credential(
-          verificationId: _verificationId!, smsCode: otp);
-
-      auth.signInWithCredential(credential);
+      await auth.signInWithCredential(credential);
       Navigator.of(context).popUntil(
         (route) => route.isFirst,
       );
@@ -74,6 +68,16 @@ class _VerificationScreenState extends State<VerificationScreen> {
     } on Exception catch (e) {
       _showFailedSigninDialog('Failed to authenticate phone number');
     }
+  }
+
+  void _signInWithOTP(String otp) {
+    print('Signing in with OTP: $otp');
+    setState(() {
+      _isSending = true;
+    });
+    PhoneAuthCredential credential = PhoneAuthProvider.credential(
+        verificationId: _verificationId!, smsCode: otp);
+    _signInWithCredential(credential);
   }
 
   void _showFailedSigninDialog(String message) {
@@ -88,6 +92,47 @@ class _VerificationScreenState extends State<VerificationScreen> {
         },
       ),
     ]);
+  }
+
+  void _startTimer(int start) {
+    setState(() {
+      _seconds = start;
+      _isCountingDown = true;
+    });
+    _timer = Timer.periodic(
+      const Duration(seconds: 1),
+      (Timer timer) {
+        if (_seconds == 0) {
+          setState(() {
+            timer.cancel();
+            _isCountingDown = false;
+          });
+        } else {
+          setState(() {
+            _seconds--;
+          });
+        }
+      },
+    );
+  }
+
+  String _formatTimer(int seconds) {
+    // Duration.toString(): 0:05:00.000000
+    return seconds != 0
+        ? Duration(seconds: seconds).toString().substring(2, 7)
+        : '';
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _verifyPhoneNumber();
+  }
+
+  @override
+  void dispose() {
+    _timer!.cancel();
+    super.dispose();
   }
 
   @override
@@ -178,26 +223,78 @@ class _VerificationScreenState extends State<VerificationScreen> {
                       height: 24,
                     ),
                     SizedBox(
-                      width: 120,
+                      width: 300,
                       child: _isSending
-                          ? const LinearProgressIndicator(
-                              backgroundColor: Colors.transparent,
+                          ? const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 31),
+                              child: LinearProgressIndicator(
+                                backgroundColor: Colors.transparent,
+                              ),
                             )
-                          : TextField(
-                              controller: _codeController,
-                              style: Theme.of(context)
+                          : PinCodeTextField(
+                              appContext: context,
+                              length: 6,
+                              keyboardType: TextInputType.number,
+                              textStyle: Theme.of(context)
                                   .textTheme
-                                  .bodyMedium!
+                                  .titleLarge!
                                   .copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .surface),
-                              onChanged: (value) {
-                                if (value.length == 6) {
-                                  _signInWithOTP(value);
-                                }
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .surface
+                                        .withOpacity(0.85),
+                                  ),
+                              pinTheme: PinTheme(
+                                activeColor: Theme.of(context)
+                                    .colorScheme
+                                    .primary
+                                    .withOpacity(0.8),
+                                inactiveColor: Theme.of(context)
+                                    .colorScheme
+                                    .primary
+                                    .withOpacity(0.3),
+                                selectedColor:
+                                    Theme.of(context).colorScheme.primary,
+                              ),
+                              onCompleted: (value) {
+                                _signInWithOTP(value);
                               },
                             ),
+                    ),
+                    Text(
+                      'Enter 6-digit code',
+                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .surface
+                              .withOpacity(0.85)),
+                    ),
+                    const SizedBox(
+                      height: 70,
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.message,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .surface
+                              .withOpacity(0.85)),
+                      title: Text(
+                        'Resend SMS',
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .surface
+                                .withOpacity(0.85)),
+                      ),
+                      trailing: Text(_formatTimer(_seconds),
+                          style:
+                              Theme.of(context).textTheme.bodyMedium!.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .surface
+                                        .withOpacity(0.85),
+                                  )),
+                      onTap: !_isCountingDown ? _verifyPhoneNumber : null,
                     ),
                   ],
                 ),

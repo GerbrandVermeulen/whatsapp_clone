@@ -76,6 +76,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           FloatingActionButton(
+            heroTag: 'add_chat',
             elevation: 3,
             backgroundColor: Theme.of(context).colorScheme.primary,
             onPressed: () {
@@ -103,6 +104,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             height: 16,
           ),
           FloatingActionButton.small(
+            heroTag: 'mate',
             elevation: 3,
             backgroundColor: Theme.of(context).colorScheme.onPrimary,
             onPressed: () {},

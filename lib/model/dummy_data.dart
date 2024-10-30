@@ -1,26 +1,26 @@
 import 'package:whatsapp_clone/model/chat.dart';
 
 final dummy_chats = [
-  Chat(
-    name: 'Elias',
-    number: '0718894672',
-    imageUrl: 'assets/images/user-icon.jpg',
-    unreadCount: 0,
-    messages: [
-      Message(
-          text: 'Please remember to drink water!',
-          status: Status.received,
-          dateTime: DateTime.parse('2024-10-24 17:42:00')),
-      Message(
-          text: 'This is also a test message!',
-          status: Status.received,
-          dateTime: DateTime.parse('2024-10-24 17:43:00')),
-      Message(
-          text: 'Indeed, this is another test message!',
-          status: Status.received,
-          dateTime: DateTime.parse('2024-10-24 17:44:00')),
-    ],
-  ),
+  // Chat(
+  //   name: 'Elias',
+  //   number: '0718894672',
+  //   imageUrl: 'assets/images/user-icon.jpg',
+  //   unreadCount: 0,
+  //   messages: [
+  //     Message(
+  //         text: 'Please remember to drink water!',
+  //         status: Status.received,
+  //         dateTime: DateTime.parse('2024-10-24 17:42:00')),
+  //     Message(
+  //         text: 'This is also a test message!',
+  //         status: Status.received,
+  //         dateTime: DateTime.parse('2024-10-24 17:43:00')),
+  //     Message(
+  //         text: 'Indeed, this is another test message!',
+  //         status: Status.received,
+  //         dateTime: DateTime.parse('2024-10-24 17:44:00')),
+  //   ],
+  // ),
   Chat(
     name: 'Ma',
     number: '0825313404',

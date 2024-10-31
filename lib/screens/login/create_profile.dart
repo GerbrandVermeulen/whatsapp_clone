@@ -19,8 +19,12 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   String? _name;
   File? _selectedImage;
+  bool _isSubmitting = false;
 
   void _submit() async {
+    setState(() {
+      _isSubmitting = true;
+    });
     try {
       if (_formKey.currentState!.validate()) {
         _formKey.currentState!.save();
@@ -51,6 +55,9 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
         await user.updateDisplayName(_name);
         // user.reload; // TODO Remove and check is userChanges() still works
         log('User `$_name` created');
+        setState(() {
+          _isSubmitting = false;
+        });
       }
     } catch (e) {
       showNotificationDalog(
@@ -198,18 +205,23 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                     backgroundColor: WidgetStateProperty.all<Color>(
                         Theme.of(context).colorScheme.primary),
                   ),
-                  onPressed: _submit,
+                  onPressed: !_isSubmitting ? _submit : null,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        'Finish',
-                        style: Theme.of(context).textTheme.labelLarge!.copyWith(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onTertiaryContainer,
-                            ),
-                      ),
+                      !_isSubmitting
+                          ? Text(
+                              'Finish',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelLarge!
+                                  .copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onTertiaryContainer,
+                                  ),
+                            )
+                          : const CircularProgressIndicator(),
                     ],
                   ),
                 ),

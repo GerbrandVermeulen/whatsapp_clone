@@ -221,7 +221,12 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                                         .onTertiaryContainer,
                                   ),
                             )
-                          : const CircularProgressIndicator(),
+                          : CircularProgressIndicator(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .surface
+                                  .withOpacity(0.85),
+                            ),
                     ],
                   ),
                 ),

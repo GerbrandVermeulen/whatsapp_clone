@@ -63,7 +63,7 @@ final dummy_chats = [
   ),
   Chat(
     name: 'Alma',
-    number: '+27761643804',
+    number: '+27761643805',
     imageUrl: 'assets/images/user-icon.jpg',
     unreadCount: 0,
     messages: [

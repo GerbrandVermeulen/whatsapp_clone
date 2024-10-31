@@ -32,14 +32,17 @@ class ChatList extends ConsumerWidget {
     return StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection('users')
-            .where('number', whereIn: dummy_chats.map((e) => e.number).toList())
+            .where('phone_number',
+                whereIn: dummy_chats.map((e) => e.number).toList())
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             // Add loaded users as they arrive
             final userData = snapshot.data!.docs;
             loadedUsers = {
-              for (var user in userData) user['number']: user,
+              ...loadedUsers,
+              for (var user in userData)
+                user.data()['phone_number']: user.data(),
             };
           }
 
@@ -56,7 +59,7 @@ class ChatList extends ConsumerWidget {
               final chat = chats[index - 2];
               final number = chat.number;
               // TODO Cache users locally, but update with json rsp
-              final user = User(number: number);
+              final user = User(phoneNumber: number);
               user.updateFromJson(loadedUsers[number]);
 
               return ChatItem(

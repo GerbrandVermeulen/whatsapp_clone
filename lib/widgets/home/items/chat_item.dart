@@ -14,7 +14,7 @@ class ChatItem extends StatelessWidget {
   final User user;
   final Chat chat;
 
-  bool _areSameDay(DateTime date1, DateTime date2) {
+  bool _isSameDay(DateTime date1, DateTime date2) {
     return date1.year == date2.year &&
         date1.month == date2.month &&
         date1.day == date2.day;
@@ -24,7 +24,7 @@ class ChatItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final latestMessage = chat.messages[0];
 
-    final isToday = _areSameDay(latestMessage.dateTime, DateTime.now());
+    final isToday = _isSameDay(latestMessage.dateTime, DateTime.now());
 
     final year = latestMessage.dateTime.year.toString();
     final month = latestMessage.dateTime.month.toString().padLeft(2, '0');

@@ -1,13 +1,19 @@
 class User {
-  User({required this.number, this.imageUrl});
+  User({
+    required this.phoneNumber,
+    this.username,
+    this.imageUrl,
+  });
 
-  void updateFromJson(dynamic user) {
+  void updateFromJson(Map<String, dynamic>? user) {
     if (user == null) {
       return;
     }
+    username = user['username'];
     imageUrl = user['image_url'];
   }
 
-  final String number;
+  final String phoneNumber;
+  String? username;
   String? imageUrl;
 }

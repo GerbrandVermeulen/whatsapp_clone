@@ -14,12 +14,10 @@ class ImageInput extends StatefulWidget {
 
 class _ImageInputState extends State<ImageInput> {
   File? _selectedImage;
+  final ImagePicker _picker = ImagePicker();
 
-  void _takePicture() async {
-    final imagePicker = ImagePicker();
-    final pickedImage =
-        await imagePicker.pickImage(source: ImageSource.camera, maxWidth: 600);
-
+  void _storeImage(ImageSource source) async {
+    final pickedImage = await _picker.pickImage(source: source, maxWidth: 600);
     if (pickedImage == null) {
       return;
     }
@@ -28,6 +26,63 @@ class _ImageInputState extends State<ImageInput> {
       _selectedImage = File(pickedImage.path);
     });
     widget.onPickImage(_selectedImage!);
+  }
+
+  void _pickImage() {
+    showModalBottomSheet(
+      backgroundColor: Theme.of(context).colorScheme.onTertiaryContainer,
+      context: context,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Select Image Source',
+              style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    color: Theme.of(context).colorScheme.surface,
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            const SizedBox(height: 20),
+            ListTile(
+              leading: Icon(
+                Icons.camera,
+                color: Theme.of(context).colorScheme.surface,
+              ),
+              title: Text(
+                'Camera',
+                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                      color: Theme.of(context).colorScheme.surface,
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              onTap: () {
+                Navigator.of(context).pop();
+                _storeImage(ImageSource.camera);
+              },
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.photo,
+                color: Theme.of(context).colorScheme.surface,
+              ),
+              title: Text(
+                'Gallery',
+                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                      color: Theme.of(context).colorScheme.surface,
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              onTap: () {
+                Navigator.of(context).pop();
+                _storeImage(ImageSource.gallery);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -51,7 +106,7 @@ class _ImageInputState extends State<ImageInput> {
 
     return InkWell(
       borderRadius: BorderRadius.circular(70),
-      onTap: _takePicture,
+      onTap: _pickImage,
       child: CircleAvatar(
         radius: 70,
         backgroundColor:

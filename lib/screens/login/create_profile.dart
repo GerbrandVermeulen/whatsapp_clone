@@ -1,8 +1,11 @@
+import 'dart:developer';
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:whatsapp_clone/util/alert.dart';
 import 'package:whatsapp_clone/widgets/login/image_input.dart';
 
 class CreateProfileScreen extends StatefulWidget {
@@ -18,24 +21,54 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
   File? _selectedImage;
 
   void _submit() async {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
+    try {
+      if (_formKey.currentState!.validate()) {
+        _formKey.currentState!.save();
 
-      print('Uploading image `$_selectedImage` and name `$_name`');
-      final user = FirebaseAuth.instance.currentUser;
-      if (_selectedImage != null) {
-        final storageRef = FirebaseStorage.instance
-            .ref()
-            .child('user_images')
-            .child('${user!.uid}.jpg');
+        log('Creating user `$_name`');
+        final user = FirebaseAuth.instance.currentUser;
+        String? imageUrl;
+        if (_selectedImage != null) {
+          final storageRef = FirebaseStorage.instance
+              .ref()
+              .child('user_images')
+              .child('${user!.uid}.jpg');
 
-        await storageRef.putFile(_selectedImage!);
-        final imageUrl = await storageRef.getDownloadURL();
+          await storageRef.putFile(_selectedImage!);
+          imageUrl = await storageRef.getDownloadURL();
+        }
+
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user!.uid)
+            .set({
+          'username': _name,
+          'phone_number': user.phoneNumber,
+          'image_url': imageUrl,
+        });
+
         await user.updatePhotoURL(imageUrl);
+        await user.updateDisplayName(_name);
+        // user.reload; // TODO Remove and check is userChanges() still works
+        log('User `$_name` created');
       }
-      await user!.updateDisplayName(_name);
-      user.reload;
-      print('Done uploading image and name');
+    } catch (e) {
+      showNotificationDalog(
+        context: context,
+        message: 'Failed to create user',
+        actions: [
+          TextButton(
+            style: TextButton.styleFrom(
+              textStyle: Theme.of(context).textTheme.labelLarge,
+            ),
+            child: const Text('Okay'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+      print('Failed to create user: $e');
     }
   }
 

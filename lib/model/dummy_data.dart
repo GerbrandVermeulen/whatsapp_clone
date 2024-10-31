@@ -3,7 +3,7 @@ import 'package:whatsapp_clone/model/chat.dart';
 final dummy_chats = [
   Chat(
     name: 'Elias',
-    number: '0718894672',
+    number: '+27718894672',
     imageUrl: 'assets/images/user-icon.jpg',
     unreadCount: 0,
     messages: [
@@ -23,7 +23,7 @@ final dummy_chats = [
   ),
   Chat(
     name: 'Ma',
-    number: '0825313404',
+    number: '+27825313404',
     imageUrl: 'assets/images/user-icon.jpg',
     unreadCount: 1,
     messages: [
@@ -43,7 +43,7 @@ final dummy_chats = [
   ),
   Chat(
     name: 'Pa',
-    number: '0828530219',
+    number: '+27828530219',
     imageUrl: 'assets/images/user-icon.jpg',
     unreadCount: 0,
     messages: [
@@ -63,7 +63,7 @@ final dummy_chats = [
   ),
   Chat(
     name: 'Alma',
-    number: '0761643804',
+    number: '+27761643804',
     imageUrl: 'assets/images/user-icon.jpg',
     unreadCount: 0,
     messages: [

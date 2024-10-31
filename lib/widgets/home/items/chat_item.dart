@@ -34,7 +34,10 @@ class ChatItem extends StatelessWidget {
     final minutes = latestMessage.dateTime.minute.toString().padLeft(2, '0');
 
     return ListTile(
-      leading: ProfileIcon(user: user),
+      leading: ProfileIcon(
+        user: user,
+        radius: 24,
+      ),
       title: Text(
         chat.name,
         style: Theme.of(context).textTheme.titleMedium!.copyWith(

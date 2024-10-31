@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:whatsapp_clone/model/dummy_data.dart';
+import 'package:whatsapp_clone/screens/home/new_chat/new_chat.dart';
 import 'package:whatsapp_clone/widgets/home/chat_list.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -80,7 +81,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             elevation: 3,
             backgroundColor: Theme.of(context).colorScheme.primary,
             onPressed: () {
-              // TODO
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => const NewChatScreen(),
+              ));
             },
             child: Stack(
               alignment: Alignment.center,

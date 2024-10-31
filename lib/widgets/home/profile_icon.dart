@@ -5,16 +5,21 @@ import 'package:flutter/material.dart';
 import 'package:whatsapp_clone/model/user.dart';
 
 class ProfileIcon extends StatelessWidget {
-  const ProfileIcon({super.key, required this.user});
+  const ProfileIcon({
+    super.key,
+    required this.user,
+    required this.radius,
+  });
 
   final User user;
+  final double radius;
 
   @override
   Widget build(BuildContext context) {
-    Widget fallbackImage = const CircleAvatar(
-      radius: 24,
-      backgroundColor: Color.fromARGB(29, 158, 158, 158),
-      child: Icon(Icons.person_outline_rounded,
+    Widget fallbackImage = CircleAvatar(
+      radius: radius,
+      backgroundColor: const Color.fromARGB(29, 158, 158, 158),
+      child: const Icon(Icons.person_outline_rounded,
           size: 30, color: Color.fromARGB(86, 102, 102, 102)),
     );
 
@@ -23,11 +28,11 @@ class ProfileIcon extends StatelessWidget {
     }
 
     return ClipRRect(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(radius),
         child: CachedNetworkImage(
           fit: BoxFit.cover,
-          width: 48,
-          height: 48,
+          width: radius * 2,
+          height: radius * 2,
           placeholder: (context, url) => fallbackImage,
           errorWidget: (context, url, error) => fallbackImage,
           imageUrl: user.imageUrl!,

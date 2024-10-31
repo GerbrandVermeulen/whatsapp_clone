@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:whatsapp_clone/model/user.dart';
 import 'package:whatsapp_clone/util/alert.dart';
 import 'package:whatsapp_clone/widgets/login/image_input.dart';
 
@@ -48,6 +49,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
             .set({
           'username': _name,
           'phone_number': user.phoneNumber,
+          'about': About.available,
           'image_url': imageUrl,
         });
 
@@ -221,11 +223,14 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                                         .onTertiaryContainer,
                                   ),
                             )
-                          : CircularProgressIndicator(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .surface
-                                  .withOpacity(0.85),
+                          : Padding(
+                              padding: const EdgeInsets.all(4),
+                              child: CircularProgressIndicator(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .surface
+                                    .withOpacity(0.5),
+                              ),
                             ),
                     ],
                   ),

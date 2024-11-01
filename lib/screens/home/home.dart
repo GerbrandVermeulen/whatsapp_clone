@@ -70,7 +70,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ],
       ),
       body: ChatList(
-        chats: dummy_chats,
+        chats: [],
       ),
       floatingActionButton: Column(
         verticalDirection: VerticalDirection.up,
@@ -148,7 +148,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
           BottomNavigationBarItem(
             label: 'Calls',
-            icon: Icon(Icons.call),
+            icon: Icon(Icons.call_outlined),
           ),
         ],
       ),

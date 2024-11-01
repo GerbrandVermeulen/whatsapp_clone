@@ -9,6 +9,7 @@ environment:
 dependencies:
   cached_network_image: ^3.4.1
   cloud_firestore: ^5.4.4
+  emoji_picker_flutter: ^3.1.0
   firebase_app_check: ^0.3.1+4
   firebase_auth: ^5.3.1
   firebase_core: ^3.6.0

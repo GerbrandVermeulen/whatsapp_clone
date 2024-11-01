@@ -1,30 +1,31 @@
 class User {
   User({
+    required this.id,
     required this.phoneNumber,
     this.username,
     this.about,
     this.imageUrl,
   });
 
-  User.fromJson(Map<String, dynamic> user)
+  User.fromFirestore(this.id, Map<String, dynamic> user)
       : phoneNumber = user['phone_number'],
         username = user['username'],
         about = user['about'],
         imageUrl = user['image_url'];
 
-  void updateFromJson(Map<String, dynamic>? user) {
-    if (user == null) {
-      return;
+  String get displayName {
+    if (username == null) {
+      return phoneNumber;
     }
-    username = user['username'];
-    about = user['about'];
-    imageUrl = user['image_url'];
+    return username!;
   }
 
+  final String id;
   final String phoneNumber;
   String? username;
   String? about;
   String? imageUrl;
+  DateTime? lastSeen = DateTime.now();
 }
 
 class About {

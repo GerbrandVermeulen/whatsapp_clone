@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:whatsapp_clone/model/user.dart';
+import 'package:whatsapp_clone/screens/chat/chat.dart';
 import 'package:whatsapp_clone/widgets/home/profile_icon.dart';
 
 class NewChatScreen extends StatelessWidget {
@@ -18,7 +19,8 @@ class NewChatScreen extends StatelessWidget {
         if (snapshot.hasData) {
           // Add loaded users as they arrive
           final userData = snapshot.data!.docs;
-          users.addAll(userData.map((user) => User.fromJson(user.data())));
+          users.addAll(
+              userData.map((user) => User.fromFirestore(user.id, user.data())));
         }
 
         return Scaffold(
@@ -27,23 +29,16 @@ class NewChatScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Select contact',
-                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                        // color: Colors.black,
-                        )),
+                    style: Theme.of(context).textTheme.bodyLarge),
                 Text('${users.length} contacts',
-                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        // color: Colors.black,
-                        )),
+                    style: Theme.of(context).textTheme.bodyMedium),
               ],
             ),
             bottom: PreferredSize(
-              preferredSize: Size.fromHeight(2.0), // Height of the line
+              preferredSize: const Size.fromHeight(2.0),
               child: Container(
-                height: 1.0, // Height of the line
-                color: Theme.of(context)
-                    .colorScheme
-                    .onSurface
-                    .withOpacity(0.1), // Color of the line
+                height: 1.0,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
               ),
             ),
             actions: [
@@ -81,7 +76,7 @@ class NewChatScreen extends StatelessWidget {
                   radius: 20,
                 ),
                 title: Text(
-                  user.username ?? '',
+                  user.displayName,
                   style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                         color: Colors.black,
                         fontWeight: FontWeight.bold,
@@ -94,7 +89,11 @@ class NewChatScreen extends StatelessWidget {
                       ),
                 ),
                 onTap: () {
-                  Navigator.of(context).pop(user);
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (context) => ChatScreen(
+                      user: user,
+                    ),
+                  ));
                 },
               );
             },

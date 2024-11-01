@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:whatsapp_clone/model/chat.dart';
+import 'package:whatsapp_clone/model/message.dart';
 
 class MessageStatus extends StatelessWidget {
   const MessageStatus({super.key, required this.status});

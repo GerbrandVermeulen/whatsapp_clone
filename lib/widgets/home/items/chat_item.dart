@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:whatsapp_clone/model/chat.dart';
+import 'package:whatsapp_clone/model/conversation.dart';
 import 'package:whatsapp_clone/model/user.dart';
+import 'package:whatsapp_clone/screens/chat/chat.dart';
 import 'package:whatsapp_clone/widgets/home/items/message_status.dart';
 import 'package:whatsapp_clone/widgets/home/profile_icon.dart';
 
@@ -9,10 +11,12 @@ class ChatItem extends StatelessWidget {
     super.key,
     required this.user,
     required this.chat,
+    required this.conversation,
   });
 
   final User user;
   final Chat chat;
+  final Conversation conversation;
 
   bool _isSameDay(DateTime date1, DateTime date2) {
     return date1.year == date2.year &&
@@ -22,16 +26,17 @@ class ChatItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final latestMessage = chat.messages[0];
+    final latestMessage = chat.lastMessage;
 
-    final isToday = _isSameDay(latestMessage.dateTime, DateTime.now());
+    final isToday = _isSameDay(latestMessage.timestampSent, DateTime.now());
 
-    final year = latestMessage.dateTime.year.toString();
-    final month = latestMessage.dateTime.month.toString().padLeft(2, '0');
-    final day = latestMessage.dateTime.day.toString().padLeft(2, '0');
+    final year = latestMessage.timestampSent.year.toString();
+    final month = latestMessage.timestampSent.month.toString().padLeft(2, '0');
+    final day = latestMessage.timestampSent.day.toString().padLeft(2, '0');
 
-    final hours = latestMessage.dateTime.hour.toString().padLeft(2, '0');
-    final minutes = latestMessage.dateTime.minute.toString().padLeft(2, '0');
+    final hours = latestMessage.timestampSent.hour.toString().padLeft(2, '0');
+    final minutes =
+        latestMessage.timestampSent.minute.toString().padLeft(2, '0');
 
     return ListTile(
       leading: ProfileIcon(
@@ -39,7 +44,7 @@ class ChatItem extends StatelessWidget {
         radius: 24,
       ),
       title: Text(
-        chat.name,
+        user.displayName,
         style: Theme.of(context).textTheme.titleMedium!.copyWith(
               color: Colors.black,
               fontWeight: FontWeight.bold,
@@ -51,10 +56,10 @@ class ChatItem extends StatelessWidget {
           Expanded(
             child: Text(
               chat.messages.isNotEmpty
-                  ? latestMessage.text
+                  ? latestMessage.message
                   : '[no messages yet]',
               style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    color: Theme.of(context).colorScheme.onBackground,
+                    color: Theme.of(context).colorScheme.onSurface,
                     overflow: TextOverflow.fade,
                   ),
               softWrap: false,
@@ -98,11 +103,12 @@ class ChatItem extends StatelessWidget {
         ],
       ),
       onTap: () {
-        // Navigator.of(context).push(MaterialPageRoute(
-        //   builder: (context) => chatsDetailsScreen(
-        //     place: chats[index],
-        //   ),
-        // ));
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => ChatScreen(
+            user: user,
+            conversation: conversation,
+          ),
+        ));
       },
     );
   }

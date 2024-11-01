@@ -55,7 +55,6 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
 
         await user.updatePhotoURL(imageUrl);
         await user.updateDisplayName(_name);
-        // user.reload; // TODO Remove and check is userChanges() still works
         log('User `$_name` created');
         setState(() {
           _isSubmitting = false;

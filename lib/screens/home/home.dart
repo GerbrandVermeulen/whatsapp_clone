@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,6 +17,35 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _selectedPageIndex = 0;
+
+  void _deleteUser() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    final conversations = await FirebaseFirestore.instance
+        .collection('conversations')
+        .where('participants', arrayContains: user!.uid)
+        .get();
+    // Delete all conversations with this user
+    WriteBatch conversationBatch = FirebaseFirestore.instance.batch();
+    for (var conversation in conversations.docs) {
+      // Delete all messages for this conversation
+      WriteBatch messageBatch = FirebaseFirestore.instance.batch();
+      final messages = await FirebaseFirestore.instance
+          .collection('messages')
+          .where('conversation_id', isEqualTo: conversation.id)
+          .get();
+      for (var message in messages.docs) {
+        messageBatch.delete(message.reference);
+      }
+      await messageBatch.commit();
+
+      conversationBatch.delete(conversation.reference);
+    }
+    await conversationBatch.commit();
+
+    await FirebaseFirestore.instance.collection('users').doc(user.uid).delete();
+    await user.delete();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +68,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             color: Colors.white,
             onSelected: (value) {
               if (value == 5) {
+                _deleteUser();
+              }
+              if (value == 6) {
                 FirebaseAuth.instance.signOut();
               }
             },
@@ -62,16 +97,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
               const PopupMenuItem(
                 value: 5,
-                child: Text('*Sign out (temporary)'),
+                child: Text('*Delete user (debug)'),
+              ),
+              const PopupMenuItem(
+                value: 6,
+                child: Text('*Sign out (debug)'),
               ),
             ],
             icon: const Icon(Icons.more_vert),
           )
         ],
       ),
-      body: ChatList(
-        chats: [],
-      ),
+      body: const ChatList(),
       floatingActionButton: Column(
         verticalDirection: VerticalDirection.up,
         mainAxisSize: MainAxisSize.min,

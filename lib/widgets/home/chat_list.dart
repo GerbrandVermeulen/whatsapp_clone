@@ -16,9 +16,7 @@ final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 final auth.FirebaseAuth _auth = auth.FirebaseAuth.instance;
 
 class ChatList extends ConsumerWidget {
-  const ChatList({super.key, required this.chats});
-
-  final List<Chat> chats;
+  const ChatList({super.key});
 
   Stream<List<Conversation>> _getConversations() {
     return _firestore
@@ -52,21 +50,10 @@ class ChatList extends ConsumerWidget {
             return Container();
           }
 
-          if (!snapshot.hasData) {
-            if (chats.isEmpty) {
-              return Center(
-                child: Text(
-                  'No chats added yet',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyLarge!
-                      .copyWith(color: Colors.white),
-                ),
-              );
-            }
+          List<Conversation> conversations = [];
+          if (snapshot.hasData) {
+            conversations = snapshot.data!;
           }
-
-          final conversations = snapshot.data!;
 
           return ListView.builder(
             itemCount: conversations.length + 2,
@@ -101,7 +88,11 @@ class ChatList extends ConsumerWidget {
 
                         final lastMessage = snapshot.data!;
                         final chat = Chat(
-                          unreadCount: 1,
+                          unreadCount:
+                              // TODO Maybe add unread count to conversations (per user)
+                              _auth.currentUser!.uid == lastMessage.senderId
+                                  ? 0
+                                  : 1,
                           lastMessage: lastMessage,
                           messages: [lastMessage],
                         );

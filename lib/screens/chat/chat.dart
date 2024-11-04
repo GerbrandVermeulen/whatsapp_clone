@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:whatsapp_clone/model/conversation.dart';
 import 'package:whatsapp_clone/model/user.dart';
 import 'package:whatsapp_clone/widgets/chat/last_seen.dart';
+import 'package:whatsapp_clone/widgets/chat/message_list.dart';
 import 'package:whatsapp_clone/widgets/chat/new_message.dart';
 import 'package:whatsapp_clone/widgets/home/profile_icon.dart';
 
@@ -37,6 +38,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void _sendMessage(String message) async {
     Timestamp now = Timestamp.now();
+    Conversation? conversation = _conversation;
+
     final messageDoc =
         await FirebaseFirestore.instance.collection('messages').add({
       'message': message,
@@ -47,41 +50,65 @@ class _ChatScreenState extends State<ChatScreen> {
       'type': 'text',
     });
 
-    if (_conversation != null) {
-      await FirebaseFirestore.instance
-          .collection('conversations')
-          .doc(_conversation!.id)
-          .update({
+    if (conversation == null) {
+      final conversationDoc =
+          await FirebaseFirestore.instance.collection('conversations').add({
         'last_message': messageDoc.id,
         'last_timestamp': now,
+        'participants': [widget.user.id, _auth.currentUser!.uid],
       });
-      _conversation = Conversation(
-        id: _conversation!.id,
+      conversation = Conversation(
+        id: conversationDoc.id,
         lastMessage: messageDoc.id,
         lastTimestamp: now.toDate(),
         participants: [widget.user.id, _auth.currentUser!.uid],
       );
-      return;
+    } else {
+      await FirebaseFirestore.instance
+          .collection('conversations')
+          .doc(conversation.id)
+          .update({
+        'last_message': messageDoc.id,
+        'last_timestamp': now,
+      });
+      conversation.lastMessage = messageDoc.id;
+      conversation.lastTimestamp = now.toDate();
     }
 
-    final conversationDoc =
-        await FirebaseFirestore.instance.collection('conversations').add({
-      'last_message': messageDoc.id,
-      'last_timestamp': now,
-      'participants': [widget.user.id, _auth.currentUser!.uid],
+    await FirebaseFirestore.instance
+        .collection('messages')
+        .doc(messageDoc.id)
+        .update({
+      'conversation_id': conversation.id,
     });
-    _conversation = Conversation(
-      id: conversationDoc.id,
-      lastMessage: messageDoc.id,
-      lastTimestamp: now.toDate(),
-      participants: [widget.user.id, _auth.currentUser!.uid],
-    );
+    setState(() {
+      _conversation = conversation;
+    });
+  }
+
+  void _deleteChat() async {
+    if (_conversation != null) {
+      final messages = await FirebaseFirestore.instance
+          .collection('messages')
+          .where('conversation_id', isEqualTo: _conversation!.id)
+          .get();
+      WriteBatch batch = FirebaseFirestore.instance.batch();
+      for (var doc in messages.docs) {
+        batch.delete(doc.reference);
+      }
+      await batch.commit();
+
+      await FirebaseFirestore.instance
+          .collection('conversations')
+          .doc(_conversation!.id)
+          .delete();
+    }
+    Navigator.of(context).pop();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.secondary,
       appBar: AppBar(
         leading: Row(
           mainAxisSize: MainAxisSize.min,
@@ -136,24 +163,43 @@ class _ChatScreenState extends State<ChatScreen> {
           PopupMenuButton(
             offset: const Offset(0, 54),
             color: Colors.white,
-            onSelected: (value) {},
+            onSelected: (value) {
+              if (value == 0) {
+                _deleteChat();
+              }
+            },
             itemBuilder: (context) => [
               const PopupMenuItem(
                 value: 0,
-                child: Text('New group'),
+                child: Text('Delete chat'),
               ),
             ],
             icon: const Icon(Icons.more_vert),
           )
         ],
       ),
-      body: Column(
+      body: Stack(
         children: [
-          Expanded(
-            child: Container(),
+          SizedBox.expand(
+            child: Image.asset(
+              'assets/images/default_background.jpg',
+              fit: BoxFit.cover,
+              opacity: const AlwaysStoppedAnimation(0.7),
+            ),
           ),
-          NewMessage(
-            sendMessage: _sendMessage,
+          Column(
+            children: [
+              Expanded(
+                child: _conversation != null
+                    ? MessageList(
+                        conversation: _conversation!,
+                      )
+                    : Container(),
+              ),
+              NewMessage(
+                sendMessage: _sendMessage,
+              ),
+            ],
           ),
         ],
       ),

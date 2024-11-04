@@ -1,10 +1,14 @@
+import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/material.dart';
 import 'package:whatsapp_clone/model/chat.dart';
 import 'package:whatsapp_clone/model/conversation.dart';
+import 'package:whatsapp_clone/model/message.dart';
 import 'package:whatsapp_clone/model/user.dart';
 import 'package:whatsapp_clone/screens/chat/chat.dart';
 import 'package:whatsapp_clone/widgets/home/items/message_status.dart';
 import 'package:whatsapp_clone/widgets/home/profile_icon.dart';
+
+auth.FirebaseAuth _auth = auth.FirebaseAuth.instance;
 
 class ChatItem extends StatelessWidget {
   const ChatItem({
@@ -38,6 +42,10 @@ class ChatItem extends StatelessWidget {
     final minutes =
         latestMessage.timestampSent.minute.toString().padLeft(2, '0');
 
+    final messageStatus = _auth.currentUser!.uid == latestMessage.senderId
+        ? latestMessage.status
+        : Status.received;
+
     return ListTile(
       leading: ProfileIcon(
         user: user,
@@ -52,7 +60,7 @@ class ChatItem extends StatelessWidget {
       ),
       subtitle: Row(
         children: [
-          MessageStatus(status: latestMessage.status),
+          MessageStatus(status: messageStatus),
           Expanded(
             child: Text(
               chat.messages.isNotEmpty

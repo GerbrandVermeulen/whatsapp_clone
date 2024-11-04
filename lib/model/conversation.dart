@@ -14,7 +14,7 @@ class Conversation {
         participants = List<String>.from(conversation['participants']);
 
   final String id;
-  final String lastMessage;
-  final DateTime lastTimestamp;
+  String lastMessage;
+  DateTime lastTimestamp;
   final List<String> participants;
 }

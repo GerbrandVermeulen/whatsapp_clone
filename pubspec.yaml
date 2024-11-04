@@ -37,6 +37,7 @@ flutter:
     - assets/images/user-icon.jpg
     - assets/images/meta-ai.png
     - assets/images/splash.png
+    - assets/images/default_background.jpg
 
   fonts:
     - family: Helvatica

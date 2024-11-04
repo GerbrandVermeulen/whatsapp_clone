@@ -22,6 +22,10 @@ class ChatList extends ConsumerWidget {
     return _firestore
         .collection('conversations')
         .where('participants', arrayContains: _auth.currentUser!.uid)
+        .orderBy(
+          'last_timestamp',
+          descending: true,
+        )
         .snapshots()
         .map((snapshot) {
       return snapshot.docs.map((doc) {

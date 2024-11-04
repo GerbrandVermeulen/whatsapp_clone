@@ -32,6 +32,9 @@ class _VerificationScreenState extends State<VerificationScreen> {
     });
     _startTimer(_cooldownSeconds);
 
+    // TODO! Only test phone numbers are working
+    // Look into the error messages when attempting to send verification SMSs
+    // Perhaps recreate firebase project and don't enable AppCheck
     await auth.verifyPhoneNumber(
       phoneNumber: widget.phoneNumber,
       verificationCompleted: (PhoneAuthCredential credential) async {

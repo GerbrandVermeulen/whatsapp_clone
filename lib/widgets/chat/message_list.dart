@@ -1,38 +1,30 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:whatsapp_clone/model/conversation.dart';
+import 'package:whatsapp_clone/providers/message_provider.dart';
 import 'package:whatsapp_clone/widgets/chat/message_bubble.dart';
 
-class MessageList extends StatefulWidget {
+class MessageList extends ConsumerStatefulWidget {
   const MessageList({super.key, required this.conversation});
 
   final Conversation conversation;
 
   @override
-  State<MessageList> createState() => _MessageListState();
+  ConsumerState<MessageList> createState() => _MessageListState();
 }
 
-class _MessageListState extends State<MessageList> {
+class _MessageListState extends ConsumerState<MessageList> {
   @override
   Widget build(BuildContext context) {
     final authenticatedUser = FirebaseAuth.instance.currentUser!;
+    final messageStream =
+        ref.watch(messageStreamProvider(widget.conversation.id));
 
-    return StreamBuilder(
-      stream: FirebaseFirestore.instance
-          .collection('messages')
-          .where('conversation_id', isEqualTo: widget.conversation.id)
-          .orderBy(
-            'timestamp_sent',
-            descending: true,
-          )
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return Container();
-        }
-
-        final loadedMessages = snapshot.data!.docs;
+    return messageStream.when(
+      data: (messageData) {
+        final loadedMessages = messageData.docs;
 
         return ListView.builder(
           padding: const EdgeInsets.only(
@@ -64,6 +56,8 @@ class _MessageListState extends State<MessageList> {
           },
         );
       },
+      loading: () => Container(),
+      error: (error, stackTrace) => Container(),
     );
   }
 }

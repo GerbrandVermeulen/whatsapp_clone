@@ -41,6 +41,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     await conversationBatch.commit();
 
     await FirebaseFirestore.instance.collection('users').doc(user.uid).delete();
+    // TODO User needs to be re-authenticated to delete from FirebaseAuth
+    // await user.reauthenticateWithCredential(credential);
     await user.delete();
   }
 

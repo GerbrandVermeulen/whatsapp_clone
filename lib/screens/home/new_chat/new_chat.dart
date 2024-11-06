@@ -13,6 +13,7 @@ class NewChatScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     List<User> users = [];
 
+    // TODO Fix duplicate users being displayed, use Riverpod
     return StreamBuilder(
       stream: FirebaseFirestore.instance.collection('users').snapshots(),
       builder: (context, snapshot) {

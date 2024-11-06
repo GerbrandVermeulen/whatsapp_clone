@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:whatsapp_clone/firebase_options.dart';
+import 'package:whatsapp_clone/providers/contact_provider.dart';
 import 'package:whatsapp_clone/providers/conversation_provider.dart';
 import 'package:whatsapp_clone/providers/user_auth_provider.dart';
 import 'package:whatsapp_clone/screens/home/home.dart';
@@ -34,6 +35,7 @@ class MainApp extends ConsumerWidget {
     final authState = ref.watch(userAuthProvider);
 
     ref.read(conversationStreamProvider.future);
+    ref.read(contactProvider.future);
 
     return MaterialApp(
       title: 'WhatsUpp',

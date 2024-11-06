@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +20,10 @@ class MessageList extends ConsumerStatefulWidget {
 class _MessageListState extends ConsumerState<MessageList> {
   @override
   Widget build(BuildContext context) {
+    if (widget.conversation.isEmpty()) {
+      return Container();
+    }
+
     final authenticatedUser = FirebaseAuth.instance.currentUser!;
     final messageStream =
         ref.watch(messageStreamProvider(widget.conversation.id));

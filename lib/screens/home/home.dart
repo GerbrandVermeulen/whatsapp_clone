@@ -42,6 +42,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     await FirebaseFirestore.instance.collection('users').doc(user.uid).delete();
     // TODO User needs to be re-authenticated to delete from FirebaseAuth
+    // Maybe redirect back to the verification SMS screen
     // await user.reauthenticateWithCredential(credential);
     await user.delete();
   }
@@ -159,7 +160,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         type: BottomNavigationBarType.fixed,
         onTap: (value) {
           setState(() {
-            _selectedPageIndex = value /* value */;
+            _selectedPageIndex = value;
           });
         },
         currentIndex: _selectedPageIndex,

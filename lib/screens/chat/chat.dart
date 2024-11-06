@@ -16,11 +16,11 @@ class ChatScreen extends StatefulWidget {
   ChatScreen({
     super.key,
     required this.user,
-    this.conversation,
+    required this.conversation,
   });
 
   final User user;
-  Conversation? conversation;
+  Conversation conversation;
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -28,7 +28,7 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   // TODO Notifications
-  Conversation? _conversation;
+  late Conversation _conversation;
 
   @override
   void initState() {
@@ -38,7 +38,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void _sendMessage(String message) async {
     Timestamp now = Timestamp.now();
-    Conversation? conversation = _conversation;
+    Conversation conversation = _conversation;
 
     final messageDoc =
         await FirebaseFirestore.instance.collection('messages').add({
@@ -50,7 +50,7 @@ class _ChatScreenState extends State<ChatScreen> {
       'type': 'text',
     });
 
-    if (conversation == null) {
+    if (conversation.isEmpty()) {
       final conversationDoc =
           await FirebaseFirestore.instance.collection('conversations').add({
         'last_message': messageDoc.id,
@@ -190,12 +190,9 @@ class _ChatScreenState extends State<ChatScreen> {
           Column(
             children: [
               Expanded(
-                child: _conversation != null
-                    ? MessageList(
-                        conversation: _conversation!,
-                      )
-                    : Container(),
-              ),
+                  child: MessageList(
+                conversation: _conversation,
+              )),
               NewMessage(
                 sendMessage: _sendMessage,
               ),

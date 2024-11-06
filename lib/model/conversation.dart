@@ -13,6 +13,16 @@ class Conversation {
         lastTimestamp = (conversation['last_timestamp'] as Timestamp).toDate(),
         participants = List<String>.from(conversation['participants']);
 
+  Conversation.empty()
+      : id = '-1',
+        lastMessage = '',
+        lastTimestamp = DateTime.now(),
+        participants = List.empty();
+
+  bool isEmpty() {
+    return id == '-1';
+  }
+
   final String id;
   String lastMessage;
   DateTime lastTimestamp;

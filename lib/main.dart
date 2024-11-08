@@ -4,12 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:whatsapp_clone/firebase_options.dart';
 import 'package:whatsapp_clone/providers/contact_provider.dart';
 import 'package:whatsapp_clone/providers/conversation_provider.dart';
-import 'package:whatsapp_clone/providers/message_provider.dart';
 import 'package:whatsapp_clone/providers/user_auth_provider.dart';
 import 'package:whatsapp_clone/screens/home/home.dart';
 import 'package:whatsapp_clone/screens/login/create_profile.dart';
 import 'package:whatsapp_clone/screens/login/welcome.dart';
 import 'package:whatsapp_clone/screens/splash.dart';
+import 'package:whatsapp_clone/util/user_session.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,8 +28,29 @@ final theme = ThemeData(
   fontFamily: 'Helvatica',
 );
 
-class MainApp extends ConsumerWidget {
+class MainApp extends ConsumerStatefulWidget {
   const MainApp({super.key});
+
+  @override
+  ConsumerState<MainApp> createState() {
+    return _MainAppState();
+  }
+}
+
+class _MainAppState extends ConsumerState<MainApp> {
+  UserSessionManager? userSessionManager;
+
+  void _startUserSession(String userId) {
+    userSessionManager = UserSessionManager(userId);
+    userSessionManager!.startSessionTimer();
+    _resetProviders(ref);
+  }
+
+  void _stopUserSession() {
+    if (userSessionManager != null) {
+      userSessionManager!.stopSessionTimer();
+    }
+  }
 
   void _resetProviders(WidgetRef ref) {
     ref.invalidate(conversationStreamProvider);
@@ -41,7 +62,7 @@ class MainApp extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final authState = ref.watch(userAuthProvider);
 
     return MaterialApp(
@@ -49,6 +70,7 @@ class MainApp extends ConsumerWidget {
       theme: theme,
       home: authState.when(
         data: (user) {
+          _stopUserSession();
           if (user == null) {
             return const WelcomeScreen();
           }
@@ -57,7 +79,7 @@ class MainApp extends ConsumerWidget {
             return const CreateProfileScreen();
           }
 
-          _resetProviders(ref);
+          _startUserSession(user.uid);
           return const HomeScreen();
         },
         loading: () => const SplashScreen(),

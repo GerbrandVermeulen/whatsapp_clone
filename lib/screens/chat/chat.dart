@@ -145,8 +145,22 @@ class _ChatScreenState extends State<ChatScreen> {
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
                 ),
-                if (widget.user.lastSeen != null)
-                  LastSeen(lastSeen: widget.user.lastSeen!),
+                StreamBuilder(
+                  stream: FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(widget.user.id)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return Container();
+                    }
+                    if (!snapshot.hasData) {
+                      return Container();
+                    }
+                    Timestamp lastSeen = snapshot.data!.data()!['last_seen'];
+                    return LastSeen(lastSeen: lastSeen.toDate());
+                  },
+                ),
               ],
             ),
           ),

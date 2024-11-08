@@ -64,7 +64,9 @@ class ChatItem extends ConsumerWidget {
       ),
       subtitle: Row(
         children: [
-          MessageStatus(status: messageStatus),
+          MessageStatus(
+            status: messageStatus,
+          ),
           Expanded(
             child: Text(
               chat.messages.isNotEmpty

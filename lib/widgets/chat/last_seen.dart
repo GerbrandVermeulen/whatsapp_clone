@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:whatsapp_clone/util/date_time_formatter.dart';
 
 class LastSeen extends StatelessWidget {
   const LastSeen({
@@ -17,25 +18,12 @@ class LastSeen extends StatelessWidget {
       return 'online';
     }
     if (lastSeen.isBefore(yesterday)) {
-      return 'last seen ${_formatDate(lastSeen)} at ${_formatTime(lastSeen)}';
+      return 'last seen ${DateTimeFormatter.formatDate(lastSeen)} at ${DateTimeFormatter.formatTime(lastSeen)}';
     }
     if (lastSeen.isBefore(today)) {
-      return 'last seen yesterday at ${_formatTime(lastSeen)}';
+      return 'last seen yesterday at ${DateTimeFormatter.formatTime(lastSeen)}';
     }
-    return 'last seen today at ${_formatTime(lastSeen)}';
-  }
-
-  String _formatDate(DateTime dateTime) {
-    final year = dateTime.year.toString().padLeft(4, '0');
-    final month = dateTime.month.toString().padLeft(2, '0');
-    final day = dateTime.day.toString().padLeft(2, '0');
-    return '$year/$month/$day';
-  }
-
-  String _formatTime(DateTime dateTime) {
-    final hour = dateTime.hour.toString().padLeft(2, '0');
-    final minute = dateTime.minute.toString().padLeft(2, '0');
-    return '$hour:$minute';
+    return 'last seen today at ${DateTimeFormatter.formatTime(lastSeen)}';
   }
 
   @override

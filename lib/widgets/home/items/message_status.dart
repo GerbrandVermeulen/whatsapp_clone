@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:whatsapp_clone/model/chat.dart';
 import 'package:whatsapp_clone/model/message.dart';
 
 class MessageStatus extends StatelessWidget {
-  const MessageStatus({super.key, required this.status});
+  const MessageStatus({
+    super.key,
+    required this.status,
+    this.size = 18,
+  });
 
   final Status status;
+  final double size;
 
   @override
   Widget build(BuildContext context) {
@@ -13,30 +17,37 @@ class MessageStatus extends StatelessWidget {
 
     switch (status) {
       case Status.sending:
-        indicator = const Icon(
+        indicator = Icon(
           Icons.access_time_outlined,
-          size: 8,
+          size: size,
         );
 
       case Status.sent:
-        indicator = const Icon(Icons.done_rounded);
+        indicator = Icon(
+          Icons.done_rounded,
+          size: size,
+        );
 
       case Status.delivered:
-        indicator = const Icon(
+        indicator = Icon(
           Icons.done_all_rounded,
           color: Colors.grey,
-          size: 18,
+          size: size,
         );
 
       case Status.read:
-        indicator = const Icon(
+        indicator = Icon(
           Icons.done_all_rounded,
           color: Colors.lightBlue,
-          size: 18,
+          size: size,
         );
 
       case Status.failed:
-        indicator = const Icon(Icons.cancel_outlined, color: Colors.redAccent);
+        indicator = Icon(
+          Icons.cancel_outlined,
+          color: Colors.redAccent,
+          size: size,
+        );
 
       case Status.received:
         indicator = null;

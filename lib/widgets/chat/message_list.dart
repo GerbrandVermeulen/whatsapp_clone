@@ -65,11 +65,13 @@ class _MessageListState extends ConsumerState<MessageList> {
             if (nextUserIsSame) {
               return MessageBubble.next(
                   message: chatMessage.message,
+                  timeSent: chatMessage.timestampSent,
                   status: chatMessage.status,
                   isMe: authenticatedUser.uid == currentMessageUserId);
             }
             return MessageBubble.first(
                 message: chatMessage.message,
+                timeSent: chatMessage.timestampSent,
                 status: chatMessage.status,
                 isMe: authenticatedUser.uid == currentMessageUserId);
           },

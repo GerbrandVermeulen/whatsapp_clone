@@ -4,8 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:whatsapp_clone/model/message.dart';
 
-Stream<QuerySnapshot<Map<String, dynamic>>> _getMessages(
-    String conversationId) {
+Stream<List<Message>> _getMessages(String conversationId) {
   log('Fetching messages for conversation: $conversationId');
   return FirebaseFirestore.instance
       .collection('messages')
@@ -14,11 +13,15 @@ Stream<QuerySnapshot<Map<String, dynamic>>> _getMessages(
         'timestamp_sent',
         descending: true,
       )
-      .snapshots();
+      .snapshots()
+      .map((snapshot) {
+    return snapshot.docs.map((doc) {
+      return Message.fromFirestore(doc.id, doc.data());
+    }).toList();
+  });
 }
 
 final messageStreamProvider =
-    StreamProvider.family<QuerySnapshot<Map<String, dynamic>>, String>(
-        (ref, conversationId) {
+    StreamProvider.family<List<Message>, String>((ref, conversationId) {
   return _getMessages(conversationId);
 });

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:whatsapp_clone/firebase_options.dart';
 import 'package:whatsapp_clone/providers/contact_provider.dart';
 import 'package:whatsapp_clone/providers/conversation_provider.dart';
+import 'package:whatsapp_clone/providers/message_provider.dart';
 import 'package:whatsapp_clone/providers/user_auth_provider.dart';
 import 'package:whatsapp_clone/screens/home/home.dart';
 import 'package:whatsapp_clone/screens/login/create_profile.dart';
@@ -30,12 +31,18 @@ final theme = ThemeData(
 class MainApp extends ConsumerWidget {
   const MainApp({super.key});
 
+  void _resetProviders(WidgetRef ref) {
+    ref.invalidate(conversationStreamProvider);
+    ref.invalidate(latestMessageProvider);
+    ref.invalidate(unreadCounterProvider);
+    ref.invalidate(contactProvider);
+    ref.read(conversationStreamProvider.future);
+    ref.read(contactProvider.future);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(userAuthProvider);
-
-    ref.read(conversationStreamProvider.future);
-    ref.read(contactProvider.future);
 
     return MaterialApp(
       title: 'WhatsUpp',
@@ -50,6 +57,7 @@ class MainApp extends ConsumerWidget {
             return const CreateProfileScreen();
           }
 
+          _resetProviders(ref);
           return const HomeScreen();
         },
         loading: () => const SplashScreen(),

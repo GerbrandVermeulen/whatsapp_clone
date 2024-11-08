@@ -1,16 +1,18 @@
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:whatsapp_clone/model/chat.dart';
 import 'package:whatsapp_clone/model/conversation.dart';
 import 'package:whatsapp_clone/model/message.dart';
 import 'package:whatsapp_clone/model/user.dart';
+import 'package:whatsapp_clone/providers/conversation_provider.dart';
 import 'package:whatsapp_clone/screens/chat/chat.dart';
 import 'package:whatsapp_clone/widgets/home/items/message_status.dart';
 import 'package:whatsapp_clone/widgets/home/profile_icon.dart';
 
 auth.FirebaseAuth _auth = auth.FirebaseAuth.instance;
 
-class ChatItem extends StatelessWidget {
+class ChatItem extends ConsumerWidget {
   const ChatItem({
     super.key,
     required this.user,
@@ -29,7 +31,7 @@ class ChatItem extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final latestMessage = chat.lastMessage;
 
     final isToday = _isSameDay(latestMessage.timestampSent, DateTime.now());
@@ -45,6 +47,8 @@ class ChatItem extends StatelessWidget {
     final messageStatus = _auth.currentUser!.uid == latestMessage.senderId
         ? latestMessage.status
         : Status.received;
+
+    final unreadCounter = ref.watch(unreadCounterProvider(conversation.id));
 
     return ListTile(
       leading: ProfileIcon(
@@ -75,40 +79,42 @@ class ChatItem extends StatelessWidget {
           ),
         ],
       ),
-      trailing: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Text(
-            chat.messages.isNotEmpty
-                ? isToday
-                    ? '$hours:$minutes'
-                    : '$year/$month/$day'
-                : '',
-            style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                  color: chat.unreadCount > 0
-                      ? Theme.of(context).colorScheme.primary
-                      : Theme.of(context).colorScheme.onSurface,
-                ),
-          ),
-          const SizedBox(
-            height: 4,
-          ),
-          chat.unreadCount > 0
-              ? CircleAvatar(
-                  radius: 10,
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  child: Text(
-                    chat.unreadCount.toString(),
-                    style: Theme.of(context).textTheme.labelSmall!.copyWith(
-                          color: Theme.of(context).colorScheme.surface,
-                        ),
+      trailing: unreadCounter.when(
+        data: (unreadCount) => Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text(
+              chat.messages.isNotEmpty
+                  ? isToday
+                      ? '$hours:$minutes'
+                      : '$year/$month/$day'
+                  : '',
+              style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                    color: unreadCount > 0
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.onSurface,
                   ),
-                )
-              : const SizedBox(
-                  height: 20,
-                ),
-        ],
+            ),
+            const SizedBox(
+              height: 4,
+            ),
+            unreadCount > 0
+                ? CircleAvatar(
+                    radius: 10,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    child: Text(
+                      '$unreadCount',
+                      style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                            color: Theme.of(context).colorScheme.surface,
+                          ),
+                    ),
+                  )
+                : const SizedBox(height: 20),
+          ],
+        ),
+        error: (error, stackTrace) => const SizedBox.shrink(),
+        loading: () => const SizedBox.shrink(),
       ),
       onTap: () {
         Navigator.of(context).push(MaterialPageRoute(

@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:whatsapp_clone/model/conversation.dart';
 import 'package:whatsapp_clone/model/message.dart';
+import 'package:whatsapp_clone/providers/message_provider.dart';
 import 'package:whatsapp_clone/providers/user_auth_provider.dart';
 
 final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -44,6 +45,25 @@ final conversationStreamProvider = StreamProvider<List<Conversation>>((ref) {
     },
     loading: () => const Stream.empty(),
     error: (error, stackTrace) => const Stream.empty(),
+  );
+});
+
+final unreadCounterProvider =
+    StreamProvider.family<int, String>((ref, conversationId) {
+  final messagesProvider = ref.watch(messageStreamProvider(conversationId));
+
+  return messagesProvider.when(
+    data: (messages) {
+      final unreadCount = messages
+          .where((message) =>
+              message.receiverId == _auth.currentUser!.uid &&
+              message.status == Status.delivered)
+          .toList()
+          .length;
+      return Stream.value(unreadCount);
+    },
+    loading: () => Stream.value(0),
+    error: (error, stackTrace) => Stream.value(0),
   );
 });
 

@@ -50,11 +50,6 @@ class ChatList extends ConsumerWidget {
                 return latestMessageFuture.when(
                   data: (lastMessage) {
                     final chat = Chat(
-                      unreadCount:
-                          // TODO Maybe add unread count to conversations (per user)
-                          _auth.currentUser!.uid == lastMessage.senderId
-                              ? 0
-                              : 1,
                       lastMessage: lastMessage,
                       messages: [lastMessage],
                     );

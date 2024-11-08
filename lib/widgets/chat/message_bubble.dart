@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:whatsapp_clone/model/message.dart';
+import 'package:whatsapp_clone/widgets/home/items/message_status.dart';
 
 // A MessageBubble for showing a single chat message on the ChatScreen.
 class MessageBubble extends StatelessWidget {
@@ -6,6 +8,7 @@ class MessageBubble extends StatelessWidget {
   const MessageBubble.first({
     super.key,
     required this.message,
+    required this.status,
     required this.isMe,
   }) : isFirstInSequence = true;
 
@@ -13,6 +16,7 @@ class MessageBubble extends StatelessWidget {
   const MessageBubble.next({
     super.key,
     required this.message,
+    required this.status,
     required this.isMe,
   }) : isFirstInSequence = false;
 
@@ -23,6 +27,7 @@ class MessageBubble extends StatelessWidget {
   // the shape of the bubble for messages thereafter.
   final bool isFirstInSequence;
   final String message;
+  final Status status;
 
   // Controls how the MessageBubble will be aligned.
   final bool isMe;
@@ -75,16 +80,27 @@ class MessageBubble extends StatelessWidget {
                     vertical: 2,
                     horizontal: 12,
                   ),
-                  child: Text(
-                    message,
-                    style: TextStyle(
-                      // Add a little line spacing to make the text look nicer
-                      // when multilined.
-                      height: 1.3,
-                      color:
-                          isMe ? theme.colorScheme.onSecondary : Colors.black87,
-                    ),
-                    softWrap: true,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          message,
+                          style: TextStyle(
+                            // Add a little line spacing to make the text look nicer
+                            // when multilined.
+                            height: 1.3,
+                            color: isMe
+                                ? theme.colorScheme.onSecondary
+                                : Colors.black87,
+                          ),
+                          softWrap: true,
+                        ),
+                      ),
+                      if (isMe) const SizedBox(width: 8),
+                      if (isMe) MessageStatus(status: status),
+                    ],
                   ),
                 ),
               ],
@@ -93,28 +109,5 @@ class MessageBubble extends StatelessWidget {
         ),
       ],
     );
-  }
-}
-
-class TrianglePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final Paint paint = Paint()
-      ..color = Colors.green
-      ..style = PaintingStyle.fill;
-
-    // Create a path for the triangle
-    final Path path = Path();
-    path.moveTo(size.width / 2, 0); // Top vertex
-    path.lineTo(0, size.height); // Bottom left vertex
-    path.lineTo(size.width, size.height); // Bottom right vertex
-    path.close(); // Close the path
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return false; // No need to repaint for this example
   }
 }
